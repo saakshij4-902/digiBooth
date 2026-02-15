@@ -12,7 +12,7 @@ export default function StripPreview({ photos, goBack }) {
 
   const toggleSticker = (sticker) => {
     if (stickers.includes(sticker)) {
-      setStickers(stickers.filter(s => s !== sticker));
+      setStickers(stickers.filter((s) => s !== sticker));
     } else {
       setStickers([...stickers, sticker]);
     }
@@ -20,13 +20,21 @@ export default function StripPreview({ photos, goBack }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    if (!canvas) return;
 
     const WIDTH = 380;
-    const HEIGHT = 980; 
+    const HEIGHT = 980;
 
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = WIDTH * dpr;
+    canvas.height = HEIGHT * dpr;
+
+    canvas.style.width = WIDTH + "px";
+    canvas.style.height = HEIGHT + "px";
+
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
 
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
@@ -57,23 +65,28 @@ export default function StripPreview({ photos, goBack }) {
     ctx.fillRect(stripX, stripY, stripWidth, stripHeight);
 
     const photoWidth = 260;
-    const photoHeight = 180;
     const gap = 12;
     const photoX = stripX + 20;
 
-    (async () => {
+    const draw = async () => {
+      let totalHeight = 0;
+
       for (let i = 0; i < photos.length; i++) {
         const img = new Image();
         img.src = photos[i];
-        await new Promise(resolve => img.onload = resolve);
+        await new Promise((resolve) => (img.onload = resolve));
 
-        const photoY = stripY + 25 + i * (photoHeight + gap);
+        const aspectRatio = img.height / img.width;
+        const photoHeight = photoWidth * aspectRatio;
+
+        const photoY = stripY + 25 + totalHeight;
 
         ctx.drawImage(img, photoX, photoY, photoWidth, photoHeight);
+
+        totalHeight += photoHeight + gap;
       }
 
-      const captionY =
-        stripY + 25 + photos.length * (photoHeight + gap) + 30;
+      const captionY = stripY + 25 + totalHeight + 25;
 
       const isDark = innerColor === "#111111";
 
@@ -104,25 +117,23 @@ export default function StripPreview({ photos, goBack }) {
           ctx.fillText(sticker, positions[i][0], positions[i][1]);
         }
       });
+    };
 
-    })();
-
+    draw();
   }, [photos, outerColor, innerColor, stickers, caption]);
 
   const download = () => {
     const link = document.createElement("a");
-    link.download = "korean-photobooth.png";
-    link.href = canvasRef.current.toDataURL();
+    link.download = `DigiBooth-${Date.now()}.png`;
+    link.href = canvasRef.current.toDataURL("image/png");
     link.click();
   };
 
   return (
     <div className="strip-layout">
-
       <canvas ref={canvasRef}></canvas>
 
       <div className="controls">
-
         <h3>Outer Background</h3>
         <button onClick={() => setOuterColor("#a8d8f7")}>Blue</button>
         <button onClick={() => setOuterColor("#f6a5c0")}>Pink</button>
@@ -155,9 +166,7 @@ export default function StripPreview({ photos, goBack }) {
           <button onClick={download}>Download</button>
           <button onClick={goBack}>Back</button>
         </div>
-
       </div>
-
     </div>
   );
 }

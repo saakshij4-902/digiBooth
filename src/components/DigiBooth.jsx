@@ -11,9 +11,6 @@ export default function DigiBooth() {
   const [showStrip, setShowStrip] = useState(false);
   const [frameColor, setFrameColor] = useState("#ffffff");
 
-  // ==============================
-  // OPEN CAMERA (SAFE VERSION)
-  // ==============================
   const openCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -30,9 +27,6 @@ export default function DigiBooth() {
     }
   };
 
-  // ==============================
-  // CAPTURE PHOTO (STABLE VERSION)
-  // ==============================
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -53,9 +47,6 @@ export default function DigiBooth() {
     return canvas.toDataURL("image/png");
   };
 
-  // ==============================
-  // COUNTDOWN
-  // ==============================
   const startCountdown = () => {
     if (!videoRef.current || !videoRef.current.srcObject) {
       alert("Please open the camera first 💕");
@@ -82,9 +73,6 @@ export default function DigiBooth() {
     }, 1000);
   };
 
-  // ==============================
-  // RESET
-  // ==============================
   const resetBooth = () => {
     setPhotos([]);
     setShowStrip(false);
@@ -98,7 +86,6 @@ return (
     {!showStrip && (
       <div className="main-area">
 
-        {/* LEFT SIDE */}
         <div className="left-panel">
 
           <div className="camera-frame">
@@ -150,7 +137,6 @@ return (
 
         </div>
 
-        {/* RIGHT SIDE PREVIEW */}
         <div className="preview-section">
           {photos.map((photo, index) => (
             <div key={index} className="preview-box">

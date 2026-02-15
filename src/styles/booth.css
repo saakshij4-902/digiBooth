@@ -1,7 +1,3 @@
-/* =========================
-   GLOBAL
-========================= */
-
 html, body {
   margin: 0;
   padding: 0;
@@ -10,22 +6,14 @@ html, body {
 
 }
 
-/* =========================
-   BOOTH WRAPPER
-========================= */
-
 .booth {
   width: 100%;
-  max-width: 480px;   /* restore compact width */
+  max-width: 480px;   
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
 }
 
-
-/* =========================
-   LOGO
-========================= */
 
 .logo {
   font-family: 'Pacifico', cursive;
@@ -36,9 +24,6 @@ html, body {
   text-shadow: 0 4px 10px rgba(255, 0, 150, 0.3);
 }
 
-/* =========================
-   MAIN AREA
-========================= */
 
 .main-area {
   display: flex;
@@ -47,9 +32,6 @@ html, body {
   gap: 40px;
 }
 
-/* =========================
-   CAMERA SECTION
-========================= */
 
 .left-panel {
   display: flex;
@@ -72,9 +54,6 @@ html, body {
   object-fit: cover;
 }
 
-/* =========================
-   BUTTONS
-========================= */
 
 .button-row {
   display: flex;
@@ -106,9 +85,6 @@ button:hover {
   margin-top: 15px;
 }
 
-/* =========================
-   FILTERS
-========================= */
 
 .filters {
   margin-top: 15px;
@@ -123,9 +99,6 @@ button:hover {
   margin: 4px;
 }
 
-/* =========================
-   PREVIEW SECTION
-========================= */
 
 .preview-section {
   display: flex;
@@ -148,21 +121,12 @@ button:hover {
   object-fit: cover;
 }
 
-/* =========================
-   COUNTDOWN
-========================= */
-
 .countdown {
   font-size: 40px;
   color: #ff4fa3;
   margin-top: 10px;
   text-align: center;
 }
-
-/* =========================
-   STRIP EDITOR
-========================= */
-
 .polaroid-editor {
   width: 100%;
   max-width: 420px;
@@ -172,7 +136,7 @@ button:hover {
 
 .polaroid-editor canvas {
   width: 100%;
-  max-width: 360px;  /* smaller */
+  max-width: 360px;  
   height: auto;
   display: block;
   margin: 0 auto 20px auto;
@@ -180,12 +144,6 @@ button:hover {
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
-
-
-
-/* =========================
-   MOBILE
-========================= */
 
 @media (max-width: 768px) {
 

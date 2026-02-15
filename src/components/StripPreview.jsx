@@ -18,109 +18,119 @@ export default function StripPreview({ photos, goBack }) {
     }
   };
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+ useEffect(() => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
 
-    const WIDTH = 380;
-    const HEIGHT = 980;
+  // 🔥 Render internally at 2x resolution
+  const BASE_WIDTH = 380;
+  const BASE_HEIGHT = 980;
 
-    const dpr = window.devicePixelRatio || 1;
+  const SCALE = 2; // internal resolution multiplier
 
-    canvas.width = WIDTH * dpr;
-    canvas.height = HEIGHT * dpr;
+  const WIDTH = BASE_WIDTH * SCALE;
+  const HEIGHT = BASE_HEIGHT * SCALE;
 
-    canvas.style.width = WIDTH + "px";
-    canvas.style.height = HEIGHT + "px";
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
 
-    const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
+  // Keep visual size normal
+  canvas.style.width = BASE_WIDTH + "px";
+  canvas.style.height = BASE_HEIGHT + "px";
 
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+  const ctx = canvas.getContext("2d");
 
-    const roundRect = (x, y, w, h, r) => {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
-    };
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-    ctx.fillStyle = outerColor;
-    roundRect(0, 0, WIDTH, HEIGHT, 40);
-    ctx.fill();
+  // Scale all drawing math automatically
+  ctx.scale(SCALE, SCALE);
 
-    const stripWidth = 300;
-    const stripX = (WIDTH - stripWidth) / 2;
-    const stripY = 40;
-    const stripHeight = HEIGHT - 80;
+  // ===== Outer Rounded Background =====
+  const roundRect = (x, y, w, h, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
 
-    ctx.fillStyle = innerColor;
-    ctx.fillRect(stripX, stripY, stripWidth, stripHeight);
+  ctx.fillStyle = outerColor;
+  roundRect(0, 0, BASE_WIDTH, BASE_HEIGHT, 40);
+  ctx.fill();
 
-    const photoWidth = 260;
-    const gap = 12;
-    const photoX = stripX + 20;
+  // ===== Inner Strip =====
+  const stripWidth = 300;
+  const stripX = (BASE_WIDTH - stripWidth) / 2;
+  const stripY = 40;
 
-    const draw = async () => {
-      let totalHeight = 0;
+  ctx.fillStyle = innerColor;
+  ctx.fillRect(stripX, stripY, stripWidth, BASE_HEIGHT - 80);
 
-      for (let i = 0; i < photos.length; i++) {
-        const img = new Image();
-        img.src = photos[i];
-        await new Promise((resolve) => (img.onload = resolve));
+  const photoWidth = 260;
+  const gap = 12;
+  const photoX = stripX + 20;
 
-        const aspectRatio = img.height / img.width;
-        const photoHeight = photoWidth * aspectRatio;
+  const draw = async () => {
+    let totalHeight = 0;
 
-        const photoY = stripY + 25 + totalHeight;
+    for (let i = 0; i < photos.length; i++) {
+      const img = new Image();
+      img.src = photos[i];
+      await new Promise((resolve) => (img.onload = resolve));
 
-        ctx.drawImage(img, photoX, photoY, photoWidth, photoHeight);
+      // 🔥 Preserve aspect ratio
+      const aspectRatio = img.height / img.width;
+      const photoHeight = photoWidth * aspectRatio;
 
-        totalHeight += photoHeight + gap;
+      const photoY = stripY + 25 + totalHeight;
+
+      ctx.drawImage(img, photoX, photoY, photoWidth, photoHeight);
+
+      totalHeight += photoHeight + gap;
+    }
+
+    const captionY = stripY + 25 + totalHeight + 25;
+
+    const isDark = innerColor === "#111111";
+
+    ctx.textAlign = "center";
+
+    ctx.font = "bold 22px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = isDark ? "#ffffff" : "#333";
+    ctx.fillText(caption, BASE_WIDTH / 2, captionY);
+
+    ctx.font = "14px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = isDark ? "#cccccc" : "#888";
+    ctx.fillText(
+      new Date().toLocaleDateString(),
+      BASE_WIDTH / 2,
+      captionY + 22
+    );
+
+    // Stickers
+    const positions = [
+      [stripX + 10, stripY + 10],
+      [stripX + stripWidth - 30, stripY + 10],
+      [stripX + 10, BASE_HEIGHT - 60],
+      [stripX + stripWidth - 30, BASE_HEIGHT - 60],
+    ];
+
+    stickers.forEach((sticker, i) => {
+      if (positions[i]) {
+        ctx.font = "26px serif";
+        ctx.fillText(sticker, positions[i][0], positions[i][1]);
       }
+    });
+  };
 
-      const captionY = stripY + 25 + totalHeight + 25;
-
-      const isDark = innerColor === "#111111";
-
-      ctx.textAlign = "center";
-
-      ctx.font = "bold 22px Helvetica, Arial, sans-serif";
-      ctx.fillStyle = isDark ? "#ffffff" : "#333";
-      ctx.fillText(caption, WIDTH / 2, captionY);
-
-      ctx.font = "14px Helvetica, Arial, sans-serif";
-      ctx.fillStyle = isDark ? "#cccccc" : "#888";
-      ctx.fillText(
-        new Date().toLocaleDateString(),
-        WIDTH / 2,
-        captionY + 22
-      );
-
-      const positions = [
-        [stripX + 10, stripY + 10],
-        [stripX + stripWidth - 30, stripY + 10],
-        [stripX + 10, stripY + stripHeight - 40],
-        [stripX + stripWidth - 30, stripY + stripHeight - 40],
-      ];
-
-      stickers.forEach((sticker, i) => {
-        if (positions[i]) {
-          ctx.font = "26px serif";
-          ctx.fillText(sticker, positions[i][0], positions[i][1]);
-        }
-      });
-    };
-
-    draw();
-  }, [photos, outerColor, innerColor, stickers, caption]);
+  draw();
+}, [photos, outerColor, innerColor, stickers, caption]);
 
   const download = () => {
     const link = document.createElement("a");

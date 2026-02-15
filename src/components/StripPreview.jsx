@@ -23,14 +23,13 @@ export default function StripPreview({ photos, goBack }) {
     const ctx = canvas.getContext("2d");
 
     const WIDTH = 380;
-    const HEIGHT = 980; // taller for caption breathing space
+    const HEIGHT = 980; 
 
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-    // ========= OUTER BACKGROUND (curved) =========
     const roundRect = (x, y, w, h, r) => {
       ctx.beginPath();
       ctx.moveTo(x + r, y);
@@ -49,7 +48,6 @@ export default function StripPreview({ photos, goBack }) {
     roundRect(0, 0, WIDTH, HEIGHT, 40);
     ctx.fill();
 
-    // ========= INNER STRIP (NO CURVE) =========
     const stripWidth = 300;
     const stripX = (WIDTH - stripWidth) / 2;
     const stripY = 40;
@@ -58,7 +56,6 @@ export default function StripPreview({ photos, goBack }) {
     ctx.fillStyle = innerColor;
     ctx.fillRect(stripX, stripY, stripWidth, stripHeight);
 
-    // ========= PHOTOS =========
     const photoWidth = 260;
     const photoHeight = 180;
     const gap = 12;
@@ -75,7 +72,6 @@ export default function StripPreview({ photos, goBack }) {
         ctx.drawImage(img, photoX, photoY, photoWidth, photoHeight);
       }
 
-      // ========= CAPTION AREA =========
       const captionY =
         stripY + 25 + photos.length * (photoHeight + gap) + 30;
 
@@ -83,12 +79,10 @@ export default function StripPreview({ photos, goBack }) {
 
       ctx.textAlign = "center";
 
-      // Clean Helvetica-style font
       ctx.font = "bold 22px Helvetica, Arial, sans-serif";
       ctx.fillStyle = isDark ? "#ffffff" : "#333";
       ctx.fillText(caption, WIDTH / 2, captionY);
 
-      // Date below caption
       ctx.font = "14px Helvetica, Arial, sans-serif";
       ctx.fillStyle = isDark ? "#cccccc" : "#888";
       ctx.fillText(
@@ -97,7 +91,6 @@ export default function StripPreview({ photos, goBack }) {
         captionY + 22
       );
 
-      // ========= STICKERS (safe corners) =========
       const positions = [
         [stripX + 10, stripY + 10],
         [stripX + stripWidth - 30, stripY + 10],

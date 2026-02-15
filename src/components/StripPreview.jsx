@@ -22,11 +22,10 @@ export default function StripPreview({ photos, goBack }) {
   const canvas = canvasRef.current;
   if (!canvas) return;
 
-  // 🔥 Render internally at 2x resolution
   const BASE_WIDTH = 380;
   const BASE_HEIGHT = 980;
 
-  const SCALE = 2; // internal resolution multiplier
+  const SCALE = 2; 
 
   const WIDTH = BASE_WIDTH * SCALE;
   const HEIGHT = BASE_HEIGHT * SCALE;
@@ -34,7 +33,6 @@ export default function StripPreview({ photos, goBack }) {
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
 
-  // Keep visual size normal
   canvas.style.width = BASE_WIDTH + "px";
   canvas.style.height = BASE_HEIGHT + "px";
 
@@ -42,10 +40,8 @@ export default function StripPreview({ photos, goBack }) {
 
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-  // Scale all drawing math automatically
   ctx.scale(SCALE, SCALE);
 
-  // ===== Outer Rounded Background =====
   const roundRect = (x, y, w, h, r) => {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -64,7 +60,6 @@ export default function StripPreview({ photos, goBack }) {
   roundRect(0, 0, BASE_WIDTH, BASE_HEIGHT, 40);
   ctx.fill();
 
-  // ===== Inner Strip =====
   const stripWidth = 300;
   const stripX = (BASE_WIDTH - stripWidth) / 2;
   const stripY = 40;
@@ -84,7 +79,6 @@ export default function StripPreview({ photos, goBack }) {
       img.src = photos[i];
       await new Promise((resolve) => (img.onload = resolve));
 
-      // 🔥 Preserve aspect ratio
       const aspectRatio = img.height / img.width;
       const photoHeight = photoWidth * aspectRatio;
 
@@ -113,7 +107,6 @@ export default function StripPreview({ photos, goBack }) {
       captionY + 22
     );
 
-    // Stickers
     const positions = [
       [stripX + 10, stripY + 10],
       [stripX + stripWidth - 30, stripY + 10],

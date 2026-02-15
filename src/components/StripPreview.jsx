@@ -127,7 +127,7 @@ export default function StripPreview({ photos, goBack }) {
 
   const download = () => {
     const link = document.createElement("a");
-    link.download = `DigiBooth-${Date.now()}.png`;
+    link.download = `DigiBoothSJ.png`;
     link.href = canvasRef.current.toDataURL("image/png");
     link.click();
   };
